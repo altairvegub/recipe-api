@@ -12,8 +12,8 @@ import (
 	"recipe/internal/ports"
 	"recipe/pkg/log"
 
-	"recipe/internal/database"
-	"recipe/internal/database/user"
+	"recipe/internal/adapters/postgres"
+	"recipe/internal/adapters/postgres/user"
 
 	"go.uber.org/zap"
 )
@@ -22,7 +22,7 @@ func main() {
 	cfg := config.LoadConfigs(config.RecipeApiPrefix)
 	logger := log.New()
 
-	db, err := database.New(cfg.PostgresConfig.Port, cfg.PostgresConfig.Host, cfg.PostgresConfig.Username, cfg.PostgresConfig.Password, cfg.PostgresConfig.Database)
+	db, err := postgres.New(cfg.PostgresConfig.Port, cfg.PostgresConfig.Host, cfg.PostgresConfig.Username, cfg.PostgresConfig.Password, cfg.PostgresConfig.Database)
 	if err != nil {
 		logger.Errorf("Failed to initialize postgres", zap.Error(err))
 	}

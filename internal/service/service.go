@@ -2,18 +2,21 @@ package service
 
 import (
 	"fmt"
-	"recipe/internal/database/user"
+	"recipe/internal/domain"
 )
 
+// Service encapsulates all use cases of our application (business / domain logic)
 type Service interface {
 	Signup(email string, password string) error
 }
 
+// service is a private struct which stores a generic UserRepository. The caller of this will be responsible
+// suppyling a UserRepository for whichever data source is required.
 type service struct {
-	userRepo user.Repository
+	userRepo domain.UserRepository
 }
 
-func New(userRepo user.Repository) *service {
+func New(userRepo domain.UserRepository) *service {
 	return &service{
 		userRepo: userRepo,
 	}
@@ -29,10 +32,12 @@ func (s *service) Signup(email string, password string) error {
 		return ErrResourceAlreadyExists
 	}
 
-	err = s.userRepo.Create(user.UserModel{
+	userDTO := domain.UserDTO{
 		Email:    email,
 		Password: password,
-	})
+	}
+
+	err = s.userRepo.Create(userDTO)
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
