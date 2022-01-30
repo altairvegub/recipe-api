@@ -5,18 +5,32 @@ import (
 	"os"
 	"os/signal"
 	"recipe/internal/config"
+	"recipe/internal/service"
 	"syscall"
 	"time"
 
 	"recipe/internal/ports"
 	"recipe/pkg/log"
+
+	"recipe/internal/database"
+	"recipe/internal/database/user"
+
+	"go.uber.org/zap"
 )
 
 func main() {
 	cfg := config.LoadConfigs(config.RecipeApiPrefix)
 	logger := log.New()
 
-	srv := ports.RunHTTPServer(cfg.HTTPServer.Port, logger)
+	db, err := database.New(cfg.PostgresConfig.Port, cfg.PostgresConfig.Host, cfg.PostgresConfig.Username, cfg.PostgresConfig.Password, cfg.PostgresConfig.Database)
+	if err != nil {
+		logger.Errorf("Failed to initialize postgres", zap.Error(err))
+	}
+
+	svc := service.New(
+		user.NewRepository(db),
+	)
+	srv := ports.RunHTTPServer(cfg.HTTPServer.Port, logger, svc)
 
 	quit := make(chan os.Signal, 1)
 
