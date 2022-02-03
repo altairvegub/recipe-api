@@ -22,7 +22,8 @@ func HandleSignup(svc *service.Service) func(c *gin.Context) {
 			return
 		}
 
-		err := (*svc).Signup(signupRequest.Email, signupRequest.Password)
+		token, err := (*svc).Signup(signupRequest.Email, signupRequest.Password)
+
 		if err != nil {
 			if errors.Is(err, service.ErrResourceAlreadyExists) {
 				c.Status(http.StatusConflict)
@@ -32,6 +33,7 @@ func HandleSignup(svc *service.Service) func(c *gin.Context) {
 			return
 		}
 
-		c.Status(http.StatusCreated)
+		//c.Status(http.StatusCreated)
+		c.JSON(http.StatusCreated, token)
 	}
 }

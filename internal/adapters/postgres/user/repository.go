@@ -21,7 +21,7 @@ func NewRepository(db *gorm.DB) *repository {
 }
 
 // Create inserts a new user record into the users table
-func (r *repository) Create(user domain.UserDTO) error {
+func (r *repository) Create(user domain.UserDTO) (string, error) {
 	userModel := User{
 		Email:    user.Email,
 		Password: user.Password,
@@ -29,14 +29,14 @@ func (r *repository) Create(user domain.UserDTO) error {
 
 	result := r.db.Create(&userModel)
 	if result.Error != nil {
-		return fmt.Errorf("failed to create user: %w", result.Error)
+		return "", fmt.Errorf("failed to create user: %w", result.Error)
 	}
 
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("expected row to be created: %w", result.Error)
+		return "", fmt.Errorf("expected row to be created: %w", result.Error)
 	}
 
-	return nil
+	return userModel.ID, nil
 }
 
 // GetByEmail retrieves a user from the users table by email

@@ -10,7 +10,7 @@ func HashAndSaltPassword(pwd string) (string, error){
 	// generate hash and salt from a password
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
-		return "", fmt.Errorf("Failed to hash password: %w", err)
+		return "", fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	return string(hashedPass), nil
